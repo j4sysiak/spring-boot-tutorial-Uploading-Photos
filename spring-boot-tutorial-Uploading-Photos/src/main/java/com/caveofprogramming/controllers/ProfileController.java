@@ -1,9 +1,15 @@
 package com.caveofprogramming.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.validation.Valid;
 
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.auditing.config.AuditingHandlerBeanDefinitionParser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.caveofprogramming.model.Profile;
@@ -29,6 +37,9 @@ public class ProfileController {
 	
 	@Autowired
 	private PolicyFactory htmlPolicy;
+	
+	@Value("${photo.upload.directory}")
+	private String photoUploadDirectory;
 	
 	private SiteUser getUser() {
 		
@@ -93,6 +104,58 @@ public class ProfileController {
 		}
 		
 		return modelAndView;
+	}
+	
+	
+	@RequestMapping(value = "/upload-profile-photo", method = RequestMethod.POST)
+//	@ResponseBody // Return data in JSON format
+	public ModelAndView /*ResponseEntity<PhotoUploadStatus>*/  handlePhotoUploads(ModelAndView modelAndView, @RequestParam("file") MultipartFile file) {
+
+		modelAndView.setViewName("redirect:/profile");
+		
+		Path outputFilePath = Paths.get(photoUploadDirectory, file.getOriginalFilename());
+		
+		try {
+			Files.deleteIfExists(outputFilePath);
+			Files.copy(file.getInputStream(), outputFilePath);
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+//		SiteUser user = getUser();
+//		Profile profile = profileService.getUserProfile(user);
+//
+//		Path oldPhotoPath = profile.getPhoto(photoUploadDirectory);
+//		
+//		PhotoUploadStatus status = new PhotoUploadStatus(photoStatusOK);
+//
+//		try {
+//			FileInfo photoInfo = fileService.saveImageFile(file, photoUploadDirectory, "photos", "p" + user.getId(),
+//					100, 100);
+//
+//			profile.setPhotoDetails(photoInfo);
+//			profileService.save(profile);
+//
+//			if (oldPhotoPath != null) {
+//				Files.delete(oldPhotoPath);
+//			}
+//
+//		} catch (InvalidFileException e) {
+//			status.setMessage(photoStatusInvalid);
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			status.setMessage(photoStatusIOException);
+//			e.printStackTrace();
+//		} catch (ImageTooSmallException e) {
+//			status.setMessage(photoStatusTooSmall);
+//			e.printStackTrace();
+//		}
+//
+//		return new ResponseEntity(status, HttpStatus.OK);
+		
+		return modelAndView; 
 	}
 	
 }
