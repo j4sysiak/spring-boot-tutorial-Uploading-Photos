@@ -11,16 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.owasp.html.PolicyFactory;
-
+ 
 
 @Entity
 @Table(name="profile")
 public class Profile {
-	
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -31,8 +29,8 @@ public class Profile {
 	@JoinColumn(name="user_id", nullable=false)
 	private SiteUser user;
 	
-	@Column(name="about", length=5000)
-	@Size(max=5000, message="{editprofile.about.size}")
+	@Column(name="about", length=500)
+	@Size(max=500, message="{editprofile.about.size}")
 	private String about;
 	
 	@Column(name = "photo_directory", length = 10)
@@ -66,8 +64,9 @@ public class Profile {
 
 	public void setAbout(String about) {
 		this.about = about;
-	} 
+	}
 	
+
 	public String getPhotoDirectory() {
 		return photoDirectory;
 	}
@@ -91,7 +90,8 @@ public class Profile {
 	public void setPhotoExtension(String photoExtension) {
 		this.photoExtension = photoExtension;
 	}
-
+	
+	
 	public void safeCopyFrom(Profile other) {
 		if(other.about != null) {
 			this.about = other.about;
@@ -99,13 +99,13 @@ public class Profile {
 	}
 
 	public void safeMergeFrom(Profile webProfile, PolicyFactory htmlPolicy) {
-		
 		if(webProfile.about != null) {
-			//this.about = webProfile.about;
+			this.about = webProfile.about;
 			this.about = htmlPolicy.sanitize(webProfile.about);
 		}
 	}
-
+	
+	
 	public void setPhotoDetails(FileInfo info) {
 		photoDirectory = info.getSubDirectory();
 		photoExtension = info.getExtension();
@@ -121,6 +121,10 @@ public class Profile {
 		return Paths.get(baseDirectory, photoDirectory, photoName + "." +  photoExtension);
 	}
 }
+
+
+
+
 
 
 
