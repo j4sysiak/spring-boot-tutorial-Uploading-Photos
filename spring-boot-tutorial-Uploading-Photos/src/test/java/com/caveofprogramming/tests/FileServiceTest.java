@@ -5,11 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
@@ -26,6 +28,9 @@ public class FileServiceTest {
 	
 	@Autowired
 	FileService fileService;
+	
+	@Value("${photo.upload.directory}")
+	private String photoUploadDirectory;
 	
 	@Test
 	public void testGetExtension() throws Exception {
@@ -57,6 +62,20 @@ public class FileServiceTest {
 		assertFalse("jpg3 should be invalid", (Boolean)method.invoke(fileService, "jpg3"));
 		assertFalse("gi should be invalid", (Boolean)method.invoke(fileService, "gi"));
 		
+	}
+	
+	@Test
+	public void testCreateDirectory() throws Exception {
+		
+		Method method = FileService.class.getDeclaredMethod("makeSubdirectory", String.class, String.class);
+		
+		method.setAccessible(true);
+		
+		for(int i=0; i<10000; i++) {
+			File created = (File)method.invoke(fileService, photoUploadDirectory, "photo");
+			
+			assertTrue("Directory should exist " + created.getAbsolutePath(), created.exists());
+		}
 	}
 
 }
