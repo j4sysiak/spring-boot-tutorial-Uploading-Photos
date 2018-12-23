@@ -13,7 +13,6 @@ import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.auditing.config.AuditingHandlerBeanDefinitionParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+//import com.caveofprogramming.exceptions.ImageTooSmallException;
 import com.caveofprogramming.exceptions.InvalidFileException;
 import com.caveofprogramming.model.FileInfo;
 import com.caveofprogramming.model.Profile;
@@ -60,29 +60,32 @@ public class ProfileController {
 		
 		return siteUserService.get(email);
 	}
-	 
+
 	@RequestMapping(value="/profile")
 	public ModelAndView showProfile(ModelAndView modelAndView) {
-    
- 		SiteUser user = getUser();
- 		Profile profile = profileService.getUserProfile(user);
- 		
-		modelAndView.getModel().put("profile", profile);
 		 
-		if(profile == null) {
-			profile = new Profile();
-			profile.setUser(user);
-			profileService.save(profile);
-		}
+		SiteUser user = getUser();
 		
+		Profile profile = profileService.getUserProfile(user);
+		
+		modelAndView.getModel().put("profile", profile);
+ 
+ 		if(profile == null) {
+ 			profile = new Profile();
+ 			profile.setUser(user);
+ 			profileService.save(profile);
+ 		}
+ 		
  		Profile webProfile = new Profile();
  		webProfile.safeCopyFrom(profile);
  		
  		modelAndView.getModel().put("profile", webProfile);
- 		modelAndView.setViewName("app.profile");
- 		
+		modelAndView.setViewName("app.profile");
+		
 		return modelAndView;
 	}
+
+	
 
 	@RequestMapping(value="/edit-profile-about", method=RequestMethod.GET)
 	public ModelAndView editProfileAbout(ModelAndView modelAndView) {
@@ -110,13 +113,16 @@ public class ProfileController {
 		
 		profile.safeMergeFrom(webProfile, htmlPolicy);
 		
-		if(!result.hasErrors()) {
-			profileService.save(profile);
-			modelAndView.setViewName("redirect:/profile");
-		}
+		modelAndView.getModel().put("profile", webProfile);
 		
+ 		if(!result.hasErrors()) {
+ 			profileService.save(profile);
+ 			modelAndView.setViewName("redirect:/profile");
+ 		}
+		 
 		return modelAndView;
 	}
+	
 	
 	
 	@RequestMapping(value = "/upload-profile-photo", method = RequestMethod.POST)
@@ -126,17 +132,13 @@ public class ProfileController {
 		modelAndView.setViewName("redirect:/profile");
 		
 		SiteUser user = getUser();
-		
 		Profile profile = profileService.getUserProfile(user);
 		
 		try {
 			FileInfo photoInfo = fileService.saveImageFile(file, photoUploadDirectory, "photos", "profile");
-			
-			System.out.println(photoInfo);
-			
+			//System.out.println(photoInfo);
 			profile.setPhotoDetails(photoInfo);
 			profileService.save(profile);
-			
 			
 		} catch (InvalidFileException e) {
 			e.printStackTrace();
@@ -147,7 +149,6 @@ public class ProfileController {
 		}*/
  
 		
- 
 //		Path oldPhotoPath = profile.getPhoto(photoUploadDirectory);
 //		
 //		PhotoUploadStatus status = new PhotoUploadStatus(photoStatusOK);
@@ -179,7 +180,6 @@ public class ProfileController {
 		return modelAndView; 
 	}
 	
-	
 	@RequestMapping(value = "/profilephoto", method = RequestMethod.GET)
 	@ResponseBody
 	ResponseEntity<InputStreamResource> servePhoto() throws IOException {
@@ -199,7 +199,6 @@ public class ProfileController {
 				.contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(photoPath.toString())))
 				.body(new InputStreamResource(Files.newInputStream(photoPath, StandardOpenOption.READ)));
 	}
-	
 }
 
 

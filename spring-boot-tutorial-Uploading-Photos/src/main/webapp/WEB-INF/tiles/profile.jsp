@@ -5,7 +5,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 
-<c:url var="img" value="/img" />
+<c:url var="profilePhoto" value="/profilephoto" />
 <c:url var="editProfileAbout" value="/edit-profile-about" />
 
 <div class="row">
@@ -15,7 +15,7 @@
 		<div class="profile-about">
 
 			<div class="profile-image">
-				<img src="${img}/avatar.jpg" />
+				<img src="${profilePhoto}" />
 			</div>
 
 			<div class="profile-text">
@@ -34,6 +34,7 @@
 		<div class="profile-about-edit">
 			<a href="${editProfileAbout}">edit</a>
 		</div>
+		
 		
 		<p>&nbsp;</p>
 		<c:url value="/upload-profile-photo" var="uploadPhotoLink" />
