@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.caveofprogramming.exceptions.InvalidFileException;
+import com.caveofprogramming.model.FileInfo;
 
 @Service
 public class FileService {
@@ -64,7 +65,7 @@ public class FileService {
 	}
 	
 	
-    public void /*FileInfo*/ saveImageFile(MultipartFile file, String baseDirectory, String subDirPrefix, String filePrefix 
+    public FileInfo saveImageFile(MultipartFile file, String baseDirectory, String subDirPrefix, String filePrefix 
 			/*, int width, int height */) throws InvalidFileException, IOException /*, ImageTooSmallException*/ {
 
 		int nFilename = random.nextInt(1000);
@@ -93,8 +94,7 @@ public class FileService {
 		//
 		// ImageIO.write(resizedImage, extension, filepath.toFile());
 		//
-		// return new FileInfo(filename, extension, subDirectory.getName(),
-		// baseDirectory);
+		return new FileInfo(filename, extension, subDirectory.getName(), baseDirectory);
 
     }
 	
