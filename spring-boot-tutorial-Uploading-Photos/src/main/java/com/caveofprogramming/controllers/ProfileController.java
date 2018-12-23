@@ -119,9 +119,19 @@ public class ProfileController {
 
 		modelAndView.setViewName("redirect:/profile");
 		
+		SiteUser user = getUser();
+		
+		Profile profile = profileService.getUserProfile(user);
+		
 		try {
 			FileInfo photoInfo = fileService.saveImageFile(file, photoUploadDirectory, "photos", "profile");
+			
 			System.out.println(photoInfo);
+			
+			profile.setPhotoDetails(photoInfo);
+			profileService.save(profile);
+			
+			
 		} catch (InvalidFileException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -131,9 +141,7 @@ public class ProfileController {
 		}*/
  
 		
-//		SiteUser user = getUser();
-//		Profile profile = profileService.getUserProfile(user);
-//
+ 
 //		Path oldPhotoPath = profile.getPhoto(photoUploadDirectory);
 //		
 //		PhotoUploadStatus status = new PhotoUploadStatus(photoStatusOK);
