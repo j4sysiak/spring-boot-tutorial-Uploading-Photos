@@ -1,16 +1,21 @@
 package com.caveofprogramming.controllers;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.validation.Valid;
 
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.auditing.config.AuditingHandlerBeanDefinitionParser;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -171,6 +177,27 @@ public class ProfileController {
 //		return new ResponseEntity(status, HttpStatus.OK);
 		
 		return modelAndView; 
+	}
+	
+	
+	@RequestMapping(value = "/profilephoto", method = RequestMethod.GET)
+	@ResponseBody
+	ResponseEntity<InputStreamResource> servePhoto() throws IOException {
+		
+		SiteUser user = getUser();
+		Profile profile = profileService.getUserProfile(user);
+
+		Path photoPath = Paths.get(photoUploadDirectory, "default", "avatar.jpg");
+
+		if (profile != null && profile.getPhoto(photoUploadDirectory) != null) {
+			photoPath = profile.getPhoto(photoUploadDirectory);
+		}
+
+		return ResponseEntity
+				.ok()
+				.contentLength(Files.size(photoPath))
+				.contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(photoPath.toString())))
+				.body(new InputStreamResource(Files.newInputStream(photoPath, StandardOpenOption.READ)));
 	}
 	
 }
