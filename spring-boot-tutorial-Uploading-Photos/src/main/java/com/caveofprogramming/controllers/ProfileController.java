@@ -134,11 +134,17 @@ public class ProfileController {
 		SiteUser user = getUser();
 		Profile profile = profileService.getUserProfile(user);
 		
+		Path oldPhotoPath = profile.getPhoto(photoUploadDirectory);
+		
 		try {
-			FileInfo photoInfo = fileService.saveImageFile(file, photoUploadDirectory, "photos", "profile");
+			FileInfo photoInfo = fileService.saveImageFile(file, photoUploadDirectory, "photos", "pr"+user.getId(), 100, 100);
 			//System.out.println(photoInfo);
 			profile.setPhotoDetails(photoInfo);
 			profileService.save(profile);
+			
+ 			if (oldPhotoPath != null) {
+ 				Files.delete(oldPhotoPath);
+ 			}
 			
 		} catch (InvalidFileException e) {
 			e.printStackTrace();

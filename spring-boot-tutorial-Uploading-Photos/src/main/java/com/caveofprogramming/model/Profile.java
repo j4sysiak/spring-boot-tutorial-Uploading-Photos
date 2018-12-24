@@ -33,10 +33,10 @@ public class Profile {
 	@Size(max=500, message="{editprofile.about.size}")
 	private String about;
 	
-	@Column(name = "photo_directory", length = 10)
+	@Column(name = "photo_directory", length = 20)
 	private String photoDirectory;
 
-	@Column(name = "photo_name", length = 10)
+	@Column(name = "photo_name", length = 20)
 	private String photoName;
 
 	@Column(name = "photo_extension", length = 5)

@@ -1,5 +1,7 @@
 package com.caveofprogramming.service;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+
 
 //import com.caveofprogramming.exceptions.ImageTooSmallException;
 import com.caveofprogramming.exceptions.InvalidFileException;
@@ -73,9 +77,9 @@ public class FileService {
 		public FileInfo saveImageFile(MultipartFile file, 
 											String baseDirectory, 
 													String subDirPrefix, 
-															String filePrefix  
-//																	//int width, 
-																		//	int height
+															String filePrefix,  
+ 																	 int width, 
+																		 int height
 																			) throws InvalidFileException, IOException /*, ImageTooSmallException*/ {
 			
 			int nFilename = random.nextInt(1000);
@@ -96,17 +100,39 @@ public class FileService {
 			
 			Path filepath = Paths.get(subDirectory.getCanonicalPath(), filename + "." + extension);
 			
-			Files.deleteIfExists(filepath);
+			//Files.deleteIfExists(filepath);
+			//Files.copy(file.getInputStream(), filepath);
 			
-			Files.copy(file.getInputStream(), filepath);
-			
-//			BufferedImage resizedImage = resizeImage(file, width, height);
-//			
-//			ImageIO.write(resizedImage, extension, filepath.toFile());
-//			
+ 			BufferedImage resizedImage = resizeImage(file, width, height);
+ 			
+ 			ImageIO.write(resizedImage, extension, filepath.toFile());
+			 
  			return new FileInfo(filename, extension, subDirectory.getName(), baseDirectory);
-	
 		}
+
+		private BufferedImage resizeImage(MultipartFile inputFile, int width, int height) throws IOException /*, ImageTooSmallException*/ {
+			
+			BufferedImage image = ImageIO.read(inputFile.getInputStream());
+			
+			if(image.getWidth() < width || image.getHeight() < height) {
+				//throw new ImageTooSmallException();
+			}
+			
+			double widthScale = (double)width/image.getWidth();
+			double heightScale = (double)height/image.getHeight();
+			
+			double scale = Math.max(widthScale, heightScale);
+			
+			BufferedImage scaledImage = new BufferedImage((int)(scale * image.getWidth()),   (int)(scale * image.getHeight()),   image.getType());
+			
+			Graphics2D g = scaledImage.createGraphics();
+			
+			AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
+			
+			g.drawImage(image, transform, null);
+			
+			return scaledImage.getSubimage(0, 0, width, height);
+	}
 	
 }
 
