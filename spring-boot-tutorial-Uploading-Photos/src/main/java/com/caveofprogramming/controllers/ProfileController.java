@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-//import com.caveofprogramming.exceptions.ImageTooSmallException;
+import com.caveofprogramming.exceptions.ImageTooSmallException;
 import com.caveofprogramming.exceptions.InvalidFileException;
 import com.caveofprogramming.model.FileInfo;
 import com.caveofprogramming.model.Profile;
@@ -150,9 +150,9 @@ public class ProfileController {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} /*catch (ImageTooSmallException e) {
+		} catch (ImageTooSmallException e) {
 			e.printStackTrace();
-		}*/
+		}
  
 		
 //		Path oldPhotoPath = profile.getPhoto(photoUploadDirectory);

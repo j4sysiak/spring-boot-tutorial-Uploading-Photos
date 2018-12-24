@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 
+
+import com.caveofprogramming.exceptions.ImageTooSmallException;
 //import com.caveofprogramming.exceptions.ImageTooSmallException;
 import com.caveofprogramming.exceptions.InvalidFileException;
 import com.caveofprogramming.model.FileInfo;
@@ -80,7 +82,7 @@ public class FileService {
 															String filePrefix,  
  																	 int width, 
 																		 int height
-																			) throws InvalidFileException, IOException /*, ImageTooSmallException*/ {
+																			) throws InvalidFileException, IOException, ImageTooSmallException {
 			
 			int nFilename = random.nextInt(1000);
 			
@@ -110,12 +112,12 @@ public class FileService {
  			return new FileInfo(filename, extension, subDirectory.getName(), baseDirectory);
 		}
 
-		private BufferedImage resizeImage(MultipartFile inputFile, int width, int height) throws IOException /*, ImageTooSmallException*/ {
+		private BufferedImage resizeImage(MultipartFile inputFile, int width, int height) throws IOException, ImageTooSmallException {
 			
 			BufferedImage image = ImageIO.read(inputFile.getInputStream());
 			
 			if(image.getWidth() < width || image.getHeight() < height) {
-				//throw new ImageTooSmallException();
+				throw new ImageTooSmallException();
 			}
 			
 			double widthScale = (double)width/image.getWidth();
